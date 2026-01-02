@@ -499,6 +499,71 @@ h1{
   z-index:120;
 }
 
+/* ================= PROFILE PHOTO ================= */
+.profile-wrap{
+  position: relative;
+  width: 190px;
+  height: 190px;
+  margin-bottom: 42px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Outer rotating glow */
+.profile-glow{
+  position:absolute;
+  inset:-14px;
+  border-radius:50%;
+  background:
+    conic-gradient(
+      from 0deg,
+      transparent 0%,
+      rgba(228,174,11,.0) 20%,
+      rgba(228,174,11,.9) 45%,
+      rgba(228,174,11,.0) 70%,
+      transparent 100%
+    );
+  filter: blur(8px);
+  animation: spin 5s linear infinite;
+}
+
+/* Profile image ring */
+.profile-ring{
+  position:relative;
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  padding:6px;
+  background: linear-gradient(135deg, var(--accent), #f4c430);
+  box-shadow:
+    0 0 40px var(--accent-glow),
+    inset 0 0 0 1px rgba(255,255,255,.3);
+}
+
+/* Actual image */
+.profile-ring img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:50%;
+  border:4px solid rgba(12,12,12,.9);
+  background:#000;
+}
+
+/* Floating animation */
+@keyframes float{
+  0%,100%{ transform: translateY(0); }
+  50%{ transform: translateY(-12px); }
+}
+
+/* Glow rotation */
+@keyframes spin{
+  from{ transform: rotate(0deg); }
+  to{ transform: rotate(360deg); }
+}
+
+
 /* ================= MOBILE: VERTICAL SCROLL MODE ================= */
 @media (max-width: 768px){
   html, body{
@@ -555,6 +620,55 @@ h1{
 @media (min-width: 769px){
   .top-nav{ display:none; }
 }
+
+/* ================= HOME LAYOUT ================= */
+.home-layout{
+  display:grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  align-items:center;
+  gap:30px;
+}
+
+/* Left text */
+.home-text{
+  max-width: 650px;
+}
+
+/* Right photo */
+.home-photo{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* Adjust profile size for hero */
+.home-photo .profile-wrap{
+  margin:0;
+  width:320px;
+  height:320px;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px){
+  .home-layout{
+    grid-template-columns: 1fr;
+    text-align:center;
+  }
+
+  .home-text{
+    order:2;
+  }
+
+  .home-photo{
+    order:1;
+    margin-bottom: 20px;
+  }
+
+  .cta-group{
+    justify-content:center;
+  }
+}
+
 </style>
 </head>
 
@@ -606,26 +720,44 @@ h1{
   <!-- HOME -->
   <section class="panel is-active" id="sec-0" data-bg="var(--bg0)">
     <div class="content">
-      <div class="hero-card">
-        <h1>Mr. Sovorthanak</h1>
-        <div class="subtitle">Full-Stack Developer & Product Designer</div>
-        <p class="description">
-          I craft beautiful, performant web experiences that blend cutting-edge technology with thoughtful design.
-          Specialized in building scalable applications that users love.
-        </p>
-        <div class="cta-group">
-          <button class="btn btn-primary" type="button">
-            <span class="material-symbols-rounded">rocket_launch</span>
-            View Projects
-          </button>
-          <button class="btn btn-secondary" type="button">
-            <span class="material-symbols-rounded">download</span>
-            Download CV
-          </button>
+      <div class="hero-card home-layout">
+
+        <!-- LEFT: TEXT -->
+        <div class="home-text">
+          <h1>Sovorthanak</h1>
+          <div class="subtitle">Full-Stack Developer & Product Designer</div>
+          <p class="description">
+            I craft beautiful, performant web experiences that blend cutting-edge technology with thoughtful design.
+            Specialized in building scalable applications that users love.
+          </p>
+
+          <div class="cta-group">
+            <button class="btn btn-primary" type="button">
+              <span class="material-symbols-rounded">rocket_launch</span>
+              View Projects
+            </button>
+            <button class="btn btn-secondary" type="button">
+              <span class="material-symbols-rounded">download</span>
+              Download CV
+            </button>
+          </div>
         </div>
+
+        <!-- RIGHT: PROFILE PHOTO -->
+        <div class="home-photo">
+          <div class="profile-wrap">
+            <div class="profile-glow"></div>
+            <div class="profile-ring">
+              <img src="self_photo.png" alt="Profile Photo" />
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
+
+
 
   <!-- PROJECTS -->
   <section class="panel" id="sec-1" data-bg="var(--bg1)">
@@ -784,7 +916,7 @@ h1{
     </div>
   </section>
 
-  <div class="hint">← → or Mouse Wheel to navigate</div>
+  <div class="hint">↑ ↓ or Mouse Wheel to navigate</div>
 </div>
 
 <script>
@@ -830,12 +962,26 @@ mobileButtons.forEach(btn=>{
   });
 });
 
-// Desktop keyboard navigation
-window.addEventListener('keydown',e=>{
+// Desktop keyboard navigation (UP/DOWN)
+window.addEventListener('keydown', (e) => {
   if (isMobile()) return;
-  if(e.key==='ArrowRight') setActive((index+1)%panels.length);
-  if(e.key==='ArrowLeft') setActive((index-1+panels.length)%panels.length);
+
+  // prevent page from scrolling with these keys on desktop mode
+  const keys = ["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "];
+  if (keys.includes(e.key)) e.preventDefault();
+
+  if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") {
+    setActive((index + 1) % panels.length);
+  }
+
+  if (e.key === "ArrowUp" || e.key === "PageUp") {
+    setActive((index - 1 + panels.length) % panels.length);
+  }
+
+  if (e.key === "Home") setActive(0);
+  if (e.key === "End") setActive(panels.length - 1);
 });
+
 
 // Desktop smooth wheel navigation
 let scrollTimeout;
